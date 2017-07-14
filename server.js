@@ -52,6 +52,7 @@ app.get('/api/todos/search', function search(req, res) {
 app.get('/api/todos', function index(req, res) {
   /* This endpoint responds with all of the todos
    */
+   res.json({data: todos});
 });
 
 app.post('/api/todos', function create(req, res) {
@@ -64,6 +65,10 @@ app.get('/api/todos/:id', function show(req, res) {
   /* This endpoint will return a single todo with the
    * id specified in the route parameter (:id)
    */
+  //  var index = req.params.id;
+  //  let selection = todos[index] || 'Sorry no taco here';
+  //  console.log(selection);
+   res.json({todos});
 });
 
 app.put('/api/todos/:id', function update(req, res) {
