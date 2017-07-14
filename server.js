@@ -65,10 +65,9 @@ app.get('/api/todos/:id', function show(req, res) {
   /* This endpoint will return a single todo with the
    * id specified in the route parameter (:id)
    */
-  //  var index = req.params.id;
-  //  let selection = todos[index] || 'Sorry no taco here';
-  //  console.log(selection);
-   res.json({todos});
+   var todoId = req.params.id;
+   let result = todos._id || 'Sorry no taco here';
+   res.json({result});
 });
 
 app.put('/api/todos/:id', function update(req, res) {
