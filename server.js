@@ -59,15 +59,35 @@ app.post('/api/todos', function create(req, res) {
   /* This endpoint will add a todo to our "database"
    * and respond with the newly created todo.
    */
+   //for each newToDo - need to assign new id then loop through list of todos and check whether the new id === any existing todo ids. If so, +1 to newId. then check the next one, if so, +1, then check the next one, if so +1, until the newId !== any existing todo ids.
+
+   //assign random whole number for newToDo id
+   let myId = Math.floor(Math.random()*100);
+
+   //create newToDo item with form data
+   let newTodo = {
+     _id: myId,
+     task: req.body.task,
+     description: req.body.description
+   };
+
+   //add newToDo to array
+   todos.push(newTodo);
+
+//send newToDo item as JSON
+   res.json(newTodo);
 });
 
+/* This endpoint will return a single todo with the
+ * id specified in the route parameter (:id)
+ */
 app.get('/api/todos/:id', function show(req, res) {
-  /* This endpoint will return a single todo with the
-   * id specified in the route parameter (:id)
-   */
-   var todoId = req.params.id;
-   let result = todos._id || 'Sorry no taco here';
-   res.json({result});
+   let todoId = parseInt(req.params.id);
+   let selectedTodo = todos.find(function (todo){
+     return todo._id === todoId;
+   });
+
+   res.json(selectedTodo);
 });
 
 app.put('/api/todos/:id', function update(req, res) {
@@ -82,6 +102,19 @@ app.delete('/api/todos/:id', function destroy(req, res) {
    * id specified in the route parameter (:id) and respond
    * with success.
    */
+   //get todo item id from url params
+   let todoId = parseInt(req.params.id);
+
+    //iterate through all todos to find that todo item that matches the id found above
+    let completedTodo = todos.filter(function (todo){
+      return todo._id == todoId;
+    })[0];
+
+    //remove the selected to do from the to do array
+    todos.splice(todos.indexOf(completedTodo),1);
+    //send back deleted todo item
+
+   res.json(completedTodo);
 });
 
 /**********
