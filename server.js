@@ -2,6 +2,7 @@
 var express = require('express'),
     app = express(),
     bodyParser = require('body-parser');
+    db = require('./models');//drawing from index.js looks into the directory and looks for the index.js(primary resource of that folder)
 
 // configure bodyParser (for receiving form data)
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -58,14 +59,17 @@ app.get('/api/todos/search', function search(req, res) {
     return(todos.task.includes(searchTodos) || todos.description.includes(searchTodos));
   });
 
-  res.json({data : listOfFilteredTodos});
+  res.send({data: listOfFilteredTodos});
 
 });
 
 app.get('/api/todos', function index(req, res) {
   /* This endpoint responds with all of the todos
    */
-   res.json({data: todos});
+
+   db.Todo.find({}, function index (req,res){
+     res.json({data: todos});
+   }) //find all of them => empty //callback to perform once we find them
 });
 
 /* This endpoint will add a todo to our "database"
@@ -75,32 +79,40 @@ app.post('/api/todos', function create(req, res) {
   //create newTodo object with form data (`req.body`)
   let newTodo = req.body;
 
-   //if the todos list is more than one, set the newTodo._id value = the last todos item (which can be found by getting the todos.length and subtracting one)...id and add +1 to that id number. THis will be the newTodo id value
-   let lastTodo = todos[todos.length-1];
-   if(todos.length > 0){
-     newTodo._id = lastTodo._id + 1;
-   } else {
-     newTodo._id = 1;
-   }
-
-   //add newToDo to todos array
-   todos.push(newTodo);
-
+  //  //if the todos list is more than one, set the newTodo._id value = the last todos item (which can be found by getting the todos.length and subtracting one)...id and add +1 to that id number. THis will be the newTodo id value
+  //  let lastTodo = todos[todos.length-1];
+  //  if(todos.length > 0){
+  //    newTodo._id = lastTodo._id + 1;
+  //  } else {
+  //    newTodo._id = 1;
+  //  }
+   //
+  //  //add newToDo to todos array
+  //  todos.push(newTodo);
+//creates a new entry
+  let todo = new db.Todo(newTodo); //constructor - model has ability to be constructor
+  //create an instance of a Todo booklet
+  //request to the db to save a new thing
+  //when the db responsed with succesfully saved then we can either console.log that failure message and if successful it will save the JSON informatin and send to client.
+  todo.save(function (err, savedTodo){
+    console.log(err);
+    res.json(savedTodo)
+  });
 //send newToDo item as JSON
-   res.json(newTodo);
+  //  res.json(newTodo);
 });
 
 /* This endpoint will return a single todo with the
- * id specified in the route parameter (:id)
+ * id specified in the url route parameter (:id)
  */
 app.get('/api/todos/:id', function show(req, res) {
   //get todoId from url params(`req.params`)
-   let todoId = parseInt(req.params.id);
+   let todoId = req.params.id;
 
-   //find todo by its id
-   let selectedTodo = todos.find(function (todo){
-     return todo._id === todoId;
-   });
+  //  //find todo by its id
+  //  let selectedTodo = todos.find(function (todo){
+  //    return todo._id === todoId;
+  //  });
 //send the selectedTodo as JSON response
    res.json(selectedTodo);
 });
@@ -153,3 +165,18 @@ app.delete('/api/todos/:id', function destroy(req, res) {
 app.listen(3000, function() {
   console.log('Server running on http://localhost:3000');
 });
+
+
+//.findOne({_id: 9721473597}) -> only the first one not a collection. Which one has that key: value pair
+
+//.findById
+
+//.findOneAndRemove
+
+//.findOneAndUpdate
+
+//.exists
+
+//.deleteMany
+
+//.deleteOne
